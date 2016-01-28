@@ -1,1 +1,91 @@
-import React, { Component } from 'react';import {render} from 'react-dom';import KanbanBoard from './KanbanBoard'class App extends Component {  render(){    var place = "World";    return (      <h1>Hello {place}</h1>    );  }}class GroceryList extends Component {  render() {    return(      <ul>        <ListItem quantity="1" name="Bread" />        <ListItem quantity="6" name="Eggs" />        <ListItem quantity="2" name="Milk" />      </ul>    );  }}class ListItem extends Component {  render() {    return(      <li>        {this.props.quantity}x {this.props.name}      </li>    );  }}let cardsList = [  {    id: 1,    title: "Read the Book",    description: "I should read the **whole** book",    color: "#BD8D31",    status: "in-progress",    tasks: []  },  {    id: 2,    title: "write some code",    description: "Code along with the samples in the book. The complete source can be found at [github](https://github.com/pro-react)",    status: "todo",    color: "#3A7E28",    tasks: [      {        id: 1,        name: "ContactList Example",        done: true      },      {        id: 2,        name: "KanBan Example",        done: false      },      {        id: 3,        name: "My own experiments",        done: false      }    ]  },  {    id: 3,    title: "Super long title Super long title Super long title Super long title Super long title",    description: "I should read the **whole** book",    color: "#BD8D31",    status: "done",    tasks: []  }];render(<KanbanBoard cards={cardsList} />, document.getElementById('root'));// render(<GroceryList />, document.getElementById("root"));// render(<App />, document.getElementById('root'));
+import React, { Component, PropTypes } from 'react';
+import { render } from 'react-dom';
+
+class ContactsApp extends Component {
+  constructor(){
+    super();
+    this.state={
+      filterText: ''
+    };
+  }
+
+  handleUserInput(searchTerm){
+    this.setState({filterText:searchTerm})
+  }
+
+  render() {
+    return(
+      <div>
+        <SearchBar filterText={this.state.filterText}
+                   onUserInput={this.handleUserInput.bind(this)} />
+        <ContactList contacts={this.props.contacts}
+                     filterText={this.state.filterText} />
+      </div>
+    )
+  }
+}
+
+ContactsApp.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.object)
+}
+
+class SearchBar extends Component {
+  handleChange(event){
+    this.props.onUserInput(event.target.value)
+  }
+
+  render(){
+    return <input type="search"
+                  placeholder="search"
+                  value={this.props.filterText}
+                  onChange={this.handleChange.bind(this)} />
+  }
+}
+
+SearchBar.propTypes = {
+  filterText: PropTypes.string.isRequired,
+  onUserInput: PropTypes.func.isRequired
+}
+
+class ContactList extends Component {
+  render(){
+    let filteredContacts = this.props.contacts.filter(
+      (contact) => contact.name.indexOf(this.props.filterText) !== -1 || contact.email.indexOf(this.props.filterText) !== -1
+    )
+    return(
+      <ul>
+        {filteredContacts.map(
+          (contact) => <ContactItem key={contact.email}
+                                    email={contact.email}
+                                    name={contact.name} />
+        )}
+      </ul>
+    )
+  }
+}
+
+ContactList.propTypes = {
+  contacts: PropTypes.arrayOf(PropTypes.object)
+}
+
+class ContactItem extends Component {
+  render(){
+    return <li>{this.props.name} - {this.props.email}</li>
+  }
+}
+
+ContactItem.propTypes = {
+  name: PropTypes.string.isRequired,
+  email: PropTypes.string.isRequired,
+}
+
+let contacts = [
+  { name: "Cassio Zen", email: "cassiozen@gmail.com" },
+  { name: "Dan Abramov", email: "gaearon@somewhere.com" },
+  { name: "Pete Hunt", email: "floydophone@somewhere.com" },
+  { name: "Paul O'Shannessy", email: "zpao@somewhere.com" },
+  { name: "Ryan Florence", email: "rpflorence@somewhere.com" },
+  { name: "Sebastian Markbage", email: "sebmarkbage@here.com" },
+]
+
+render(<ContactsApp contacts={contacts} />, document.getElementById('root'));
