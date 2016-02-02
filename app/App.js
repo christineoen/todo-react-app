@@ -1,5 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import { render } from 'react-dom';
+import 'babel-polyfill';
+import update from 'react-addons-update';
 
 class ContactsAppContainer extends Component {
   constructor(){
